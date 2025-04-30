@@ -16,16 +16,19 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository;
 
+    // RestAPI 규칙1: 모든 insert 요청은 insert 된 데이터의 row를 조회해서 DTO에 담아서 돌려줘야한다
     @Transactional
-    public void 회원가입(UserRequest.JoinDTO joinDTO) {
+    public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
         try {
-            userRepository.save(joinDTO.toEntity());
+            User userPs = userRepository.save(reqDTO.toEntity());  // DB에서 조회된 데이터는 Ps 붙여주기 (컨벤션) - userPs를 DTO에 담아서 돌려줘야함
+            return new UserResponse.DTO(userPs);
         } catch (Exception e) {
             throw new Exception400("잘못된 요청입니다");
         }
 
     }
 
+    // TODO: A4용지에다가 id,username 적어, A4용지에 서명, A4용지에 서명해서 돌려주니까 A4용지에 user 정보가 적혀있다 - 근데 password는 있으면 안됨 보안에 민감한 정보니까 ~
     public User 로그인(UserRequest.LoginDTO loginDTO) {
         User user = userRepository.findByUsername(loginDTO.getUsername());
 
@@ -49,15 +52,16 @@ public class UserService {
         return dto;
     }
 
-    // 1. 영속화 시키기 (select 조회 - pc들어옴)
+
+    // TODO: RestAPI 규칙3: update된 데이터를 돌려줘야 한다 -> 이 역시 보안에 민감한 정보는 빼고
     @Transactional
-    public User 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer userId) {
+    public User 회원정보수정(UserRequest.UpdateDTO reqDTO, Integer userId) {
 
         User userPS = userRepository.findById(userId);
 
         // Exception404
         if (userPS == null) throw new Exception404("자원을 찾을 수 없습니다");
-        userPS.update(updateDTO.getPassword(), updateDTO.getEmail()); // 영속화된 객체의 상태변경
+        userPS.update(reqDTO.getPassword(), reqDTO.getEmail()); // 영속화된 객체의 상태변경
         return userPS; // 리턴한 이유는 세션을 동기화해야해서!!
     } // 더티체킹 -> 상태가 변경되면 update을 날려요!!
 }

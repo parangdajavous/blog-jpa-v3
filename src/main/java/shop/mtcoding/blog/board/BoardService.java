@@ -38,22 +38,24 @@ public class BoardService {
 
     }
 
-    public BoardResponse.DTO 글목록보기(Integer userId, Integer page, String keyword) {
+    public BoardResponse.ListDTO 글목록보기(Integer userId, Integer page, String keyword) {
         if (userId == null) {
             Long totalCount = boardRepository.totalCount(keyword);
             List<Board> boards = boardRepository.findAll(page, keyword);
-            return new BoardResponse.DTO(boards, page, totalCount.intValue(), keyword);
+            return new BoardResponse.ListDTO(boards, page, totalCount.intValue(), keyword);
         } else {
             Long totalCount = boardRepository.totalCount(userId, keyword);
             List<Board> boards = boardRepository.findAll(userId, page, keyword);
-            return new BoardResponse.DTO(boards, page, totalCount.intValue(), keyword);
+            return new BoardResponse.ListDTO(boards, page, totalCount.intValue(), keyword);
         }
     }
 
+    // insert 된 데이터를 조회해서 DTO에 담아줘야함
     @Transactional
-    public void 글쓰기(BoardRequest.SaveDTO saveDTO, User sessionUser) {
-        Board board = saveDTO.toEntity(sessionUser);
-        boardRepository.save(board);
+    public BoardResponse.DTO 글쓰기(BoardRequest.SaveDTO reqDTO, User sessionUser) {
+        Board board = reqDTO.toEntity(sessionUser);
+        Board boardPs = boardRepository.save(board);
+        return new BoardResponse.DTO(boardPs);
     }
 
     @Transactional
