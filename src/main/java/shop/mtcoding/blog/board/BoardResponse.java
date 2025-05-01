@@ -9,6 +9,7 @@ import java.util.List;
 
 public class BoardResponse {
 
+    // 변경된 row를 돌려주는 DTO
     @Data
     public static class DTO {
         private Integer id;
@@ -25,6 +26,24 @@ public class BoardResponse {
             this.isPublic = board.getIsPublic();
             this.userId = board.getUser().getId();
             this.createdAt = board.getCreatedAt().toString();
+        }
+    }
+
+    @Data
+    public static class UpdateFormDTO {
+        private Integer id;  // 화면에는 없지만, PK는 반드시 있어야한다
+        private String title;
+        private String content;
+        private Boolean isPublic;
+//        private Integer userId;  // 개인 식별키는 들고가봤자 의미가 없음 (식별불가) - 화면에 안보임 화면에 보여줄땐 신뢰가능하나 서버로 다시 들고올때는 바뀔수도 있기 때문에 신뢰할 수 없으므로 없애야함
+//        private String createdAt;
+
+        public UpdateFormDTO(Board board) {
+            this.id = board.getId();
+            this.title = board.getTitle();
+            this.content = board.getContent();
+            this.isPublic = board.getIsPublic();
+
         }
     }
 
