@@ -4,20 +4,21 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Repository
 public class UserRepository {
     private final EntityManager em;
 
-    public User findById(Integer id) {
-        return em.find(User.class, id);
+    public Optional<User> findById(Integer id) {
+        User userPS = em.find(User.class, id);
+        return Optional.ofNullable(userPS);
     }
 
 
     public User save(User user) {
-        System.out.println(user.getId());
         em.persist(user);
-        System.out.println(user.getId());
         return user;  // 영속객체
     }
 
@@ -37,13 +38,14 @@ public class UserRepository {
         return (User) result;
     }
 
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         try {
-            return em.createQuery("select u from User u where u.username = :username", User.class)
+            User userPS = em.createQuery("select u from User u where u.username = :username", User.class)
                     .setParameter("username", username)
                     .getSingleResult();
+            return Optional.of(userPS); // 절대 null일 수 없으므로 Optional.of(value)
         } catch (Exception e) {
-            return null;
+            return Optional.ofNullable(null);
         }
 
     }

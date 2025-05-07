@@ -6,26 +6,52 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
 public class BoardRepository {
     private final EntityManager em;
 
-    public Board findByIdJoinUserAndReplies(Integer id) {
-        Query query = em.createQuery("select b from Board b join fetch b.user left join fetch b.replies r left join fetch r.user where b.id = :id order by r.id desc", Board.class);
-        query.setParameter("id", id);
-        return (Board) query.getSingleResult();
+    public Optional<Board> findByIdJoinUserAndReplies(Integer id) {
+        try {
+            Query query = em.createQuery("select b from Board b join fetch b.user left join fetch b.replies r left join fetch r.user where b.id = :id order by r.id desc", Board.class);
+            query.setParameter("id", id);
+            Board boardPS = (Board) query.getSingleResult();
+            return Optional.of(boardPS);
+        } catch (Exception e) {
+            return Optional.ofNullable(null);
+        }
+
     }
 
-    public Board findByIdJoinUser(Integer id) {
-        Query query = em.createQuery("select b from Board b join fetch b.user where b.id = :id", Board.class);
-        query.setParameter("id", id);
-        return (Board) query.getSingleResult();
+//    public Optional<User> findByUsername(String username) {
+//        try {
+//            User userPS = em.createQuery("select u from User u where u.username = :username", User.class)
+//                    .setParameter("username", username)
+//                    .getSingleResult();
+//            return Optional.of(userPS); // 절대 null일 수 없으므로 Optional.of(value)
+//        } catch (Exception e) {
+//            return Optional.ofNullable(null);
+//        }
+//
+//    }
+
+    public Optional<Board> findByIdJoinUser(Integer id) {
+        try {
+            Query query = em.createQuery("select b from Board b join fetch b.user where b.id = :id", Board.class);
+            query.setParameter("id", id);
+            Board boardPS = (Board) query.getSingleResult();
+            return Optional.of(boardPS);
+        } catch (Exception e) {
+            return Optional.ofNullable(null);
+        }
+
     }
 
-    public Board findById(Integer id) {
-        return em.find(Board.class, id);
+    public Optional<Board> findById(Integer id) {
+        Board boardPS = em.find(Board.class, id);
+        return Optional.ofNullable(boardPS);
     }
 
     // 그룹 함수 : Long 리턴

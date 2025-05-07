@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.mtcoding.blog._core.error.ex.Exception403;
 import shop.mtcoding.blog._core.error.ex.Exception404;
+import shop.mtcoding.blog._core.error.ex.ExceptionApi404;
 import shop.mtcoding.blog.love.Love;
 import shop.mtcoding.blog.love.LoveRepository;
 import shop.mtcoding.blog.reply.ReplyRepository;
@@ -22,9 +23,8 @@ public class BoardService {
     // TODO 과제1
     @Transactional
     public BoardResponse.DTO 글수정하기(BoardRequest.UpdateDTO reqDTO, Integer boardId, Integer sessionUserId) {
-        Board boardPS = boardRepository.findById(boardId);
-
-        if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
+        Board boardPS = boardRepository.findById(boardId)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
 
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
@@ -38,8 +38,9 @@ public class BoardService {
     // TODO 과제2
     @Transactional
     public void 글삭제(Integer id, Integer sessionUserId) {   // row를 삭제하므로 돌려줄 데이터가 업음
-        Board boardPS = boardRepository.findById(id);
-        if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
+        Board boardPS = boardRepository.findById(id)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
+
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
         }
@@ -62,16 +63,19 @@ public class BoardService {
     @Transactional
     public BoardResponse.DTO 글쓰기(BoardRequest.SaveDTO reqDTO, User sessionUser) {
         Board board = reqDTO.toEntity(sessionUser);
-        Board boardPs = boardRepository.save(board);
-        return new BoardResponse.DTO(boardPs);
+        Board boardPS = boardRepository.save(board);
+        return new BoardResponse.DTO(boardPS);
     }
 
     @Transactional
     public BoardResponse.DetailDTO 글상세보기(Integer id, Integer userId) {
-        Board boardPS = boardRepository.findByIdJoinUserAndReplies(id);
+        Board boardPS = boardRepository.findByIdJoinUserAndReplies(id)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다."));
 
 
-        Love love = loveRepository.findByUserIdAndBoardId(userId, id);
+        Love love = loveRepository.findByUserIdAndBoardId(userId, id)
+                .orElseThrow(() -> new ExceptionApi404("자원을 찾을 수 없습니다."));
+
         Long loveCount = loveRepository.findByBoardId(id);
 
         Integer loveId = love == null ? null : love.getId();
@@ -83,13 +87,13 @@ public class BoardService {
 
     // select 요청 - 업데이트 된 게시글을 봄 / DTO 주면 안돼 ~
     // 규칙4: 화면에 보이는 데이터 + 반드시 Pk는 포함되어야한다
-    public BoardResponse.UpdateFormDTO 업데이트글보기(int id, Integer sessionUserId) {
-        Board boardPS = boardRepository.findById(id);
-        if (boardPS == null) throw new Exception404("자원을 찾을 수 없습니다");
+    public BoardResponse.DTO 글보기(int id, Integer sessionUserId) {
+        Board boardPS = boardRepository.findById(id)
+                .orElseThrow(() -> new Exception404("자원을 찾을 수 없습니다"));
 
         if (!boardPS.getUser().getId().equals(sessionUserId)) {
             throw new Exception403("권한이 없습니다");
         }
-        return new BoardResponse.UpdateFormDTO(boardPS);  // 이렇게 하면 controller에서 lazyloading을 안한다
+        return new BoardResponse.DTO(boardPS);  // 이렇게 하면 controller에서 lazyloading을 안한다
     }
 }

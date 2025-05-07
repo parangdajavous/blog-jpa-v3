@@ -12,6 +12,7 @@ import shop.mtcoding.blog._core.util.Resp;
 
 import java.util.Map;
 
+// TODO: 미완 / JWT 배우고 응담 완료하기
 @RequiredArgsConstructor
 @Controller
 public class UserController {
@@ -19,13 +20,11 @@ public class UserController {
     private final HttpSession session;
 
 
-    // TODO: JWT 인증 후에 하기
-    @PostMapping("/user/update")
-    public String update(@Valid UserRequest.UpdateDTO reqDTO, Errors errors) {
+    @PutMapping("/user")  // 주소에 id를 적을 수 없다 - 신뢰할 수 없기 때문 / session에서 id 꺼낸다
+    public String update(@Valid @RequestBody UserRequest.UpdateDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        // update user_tb set password = ?, email = ? where id = ?
+        // TODO: JWT 인증 후에 하기
         User userPS = userService.회원정보수정(reqDTO, sessionUser.getId());
-        // 세션 동기화
         session.setAttribute("sessionUser", userPS);
         return "redirect:/";
     }
@@ -45,8 +44,8 @@ public class UserController {
     }
 
     // TODO: JWT 인증 후에 하기
-    @PostMapping("/login")
-    public String login(@Valid UserRequest.LoginDTO reqDTO, Errors errors, HttpServletResponse response) {
+    @PostMapping("/login")  // password가 노출되면 안되기 때문에 예외로 post방식
+    public String login(@Valid @RequestBody UserRequest.LoginDTO reqDTO, Errors errors, HttpServletResponse response) {
         User sessionUser = userService.로그인(reqDTO);
         session.setAttribute("sessionUser", sessionUser);
 
