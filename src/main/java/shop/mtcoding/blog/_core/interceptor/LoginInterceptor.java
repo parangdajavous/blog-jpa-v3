@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.HandlerInterceptor;
 import shop.mtcoding.blog._core.error.ex.Exception401;
-import shop.mtcoding.blog._core.error.ex.ExceptionApi401;
 import shop.mtcoding.blog.user.User;
 
 public class LoginInterceptor implements HandlerInterceptor {
@@ -17,27 +16,12 @@ public class LoginInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         User sessionUser = (User) session.getAttribute("sessionUser");
 
-        if (sessionUser == null) {
-            if (uri.contains("/api")) {
-                throw new ExceptionApi401("인증이 필요합니다");
-//                response.setStatus(401);
-//                response.setHeader("Content-Type", "application/json");
-//                PrintWriter out = response.getWriter();
-//                Resp<?> resp = Resp.fail(401, "인증이 필요합니다");
-//                ObjectMapper mapper = new ObjectMapper();
-//                String responseBody = mapper.writeValueAsString(resp);
-//                out.println(responseBody);
-//                return false;
-            } else {
-                throw new Exception401("인증이 필요합니다");
-//                response.setStatus(401);
-//                response.setHeader("Content-Type", "text/html");
-//                PrintWriter out = response.getWriter();
-//                out.println(Script.href("인증이 필요합니다", "/login-form"));
-//                return false;
-            }
+
+        if (uri.startsWith("/s")) {
+            if (sessionUser == null) throw new Exception401("인증이 필요합니다");
         }
 
         return true;
     }
+
 }

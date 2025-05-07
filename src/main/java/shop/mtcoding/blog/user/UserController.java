@@ -20,7 +20,7 @@ public class UserController {
     private final HttpSession session;
 
 
-    @PutMapping("/user")  // 주소에 id를 적을 수 없다 - 신뢰할 수 없기 때문 / session에서 id 꺼낸다
+    @PutMapping("/s/api/user")  // 주소에 id를 적을 수 없다 - 신뢰할 수 없기 때문 / session에서 id 꺼낸다
     public String update(@Valid @RequestBody UserRequest.UpdateDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         // TODO: JWT 인증 후에 하기
