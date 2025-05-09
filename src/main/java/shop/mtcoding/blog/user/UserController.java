@@ -1,7 +1,5 @@
 package shop.mtcoding.blog.user;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,24 +40,11 @@ public class UserController {
         UserResponse.DTO respDTO = userService.회원가입(reqDTO);
         return Resp.ok(respDTO);
     }
-
-    // TODO: JWT 인증 후에 하기
+    
     @PostMapping("/login")  // password가 노출되면 안되기 때문에 예외로 post방식
-    public String login(@Valid @RequestBody UserRequest.LoginDTO reqDTO, Errors errors, HttpServletResponse response) {
-        User sessionUser = userService.로그인(reqDTO);
-        session.setAttribute("sessionUser", sessionUser);
-
-        if (reqDTO.getRememberMe() == null) {
-            Cookie cookie = new Cookie("username", null);
-            cookie.setMaxAge(0); // 즉시 만료
-            response.addCookie(cookie);
-        } else {
-            Cookie cookie = new Cookie("username", reqDTO.getUsername());
-            cookie.setMaxAge(60 * 60 * 24 * 7);
-            response.addCookie(cookie);
-        }
-
-        return "redirect:/";
+    public @ResponseBody Resp<?> login(@Valid @RequestBody UserRequest.LoginDTO reqDTO, Errors errors) {
+        UserResponse.TokenDTO respDTO = userService.로그인(reqDTO);
+        return Resp.ok(respDTO);
     }
 
     // TODO: JWT 인증 후에 하기
