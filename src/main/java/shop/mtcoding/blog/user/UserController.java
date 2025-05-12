@@ -3,7 +3,7 @@ package shop.mtcoding.blog.user;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.util.Resp;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 // TODO: 미완 / JWT 배우고 응담 완료하기
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class UserController {
     private final UserService userService;
     private final HttpSession session;
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/api/check-username-available/{username}")
-    public @ResponseBody Resp<?> checkUsernameAvailable(@PathVariable("username") String username) {
+    public ResponseEntity<?> checkUsernameAvailable(@PathVariable("username") String username) {
         Map<String, Object> dto = userService.유저네임중복체크(username);
         return Resp.ok(dto);
     }
@@ -36,21 +36,22 @@ public class UserController {
 
     @PostMapping("/join")
     // DTO는 reqDTO와 respDTO로 구분하기
-    public @ResponseBody Resp<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors errors) {
         UserResponse.DTO respDTO = userService.회원가입(reqDTO);
         return Resp.ok(respDTO);
     }
-    
+
     @PostMapping("/login")  // password가 노출되면 안되기 때문에 예외로 post방식
-    public @ResponseBody Resp<?> login(@Valid @RequestBody UserRequest.LoginDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserRequest.LoginDTO reqDTO, Errors errors) {
         UserResponse.TokenDTO respDTO = userService.로그인(reqDTO);
         return Resp.ok(respDTO);
     }
 
-    // TODO: JWT 인증 후에 하기
-    @GetMapping("/logout")
-    public String logout() {
-        session.invalidate();
-        return "redirect:/login-form";
-    }
+    // AccessToken 만으로는 로그아웃을 구현할 수 없다
+//    // TODO: JWT 인증 후에 하기
+//    @GetMapping("/logout")
+//    public String logout() {
+//        session.invalidate();
+//        return "redirect:/login-form";
+//    }  로그아웃이라는 개념이 없다
 }

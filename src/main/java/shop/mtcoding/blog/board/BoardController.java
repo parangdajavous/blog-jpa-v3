@@ -3,6 +3,7 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class BoardController {
     private final HttpSession session;
 
     @PutMapping("/s/api/board/{id}")
-    public @ResponseBody Resp<?> update(@PathVariable("id") Integer id, @Valid @RequestBody BoardRequest.UpdateDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> update(@PathVariable("id") Integer id, @Valid @RequestBody BoardRequest.UpdateDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.DTO respDTO = boardService.글수정하기(reqDTO, id, sessionUser.getId());
 
@@ -26,7 +27,7 @@ public class BoardController {
 
     // front가 들고 있는 그림에 뿌릴 데이터를 줄 controller 필요 - board의 근본 / 재사용가능
     @GetMapping("/api/board/{id}")
-    public @ResponseBody Resp<?> getBoardOne(@PathVariable("id") int id) {
+    public ResponseEntity<?> getBoardOne(@PathVariable("id") int id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.DTO respDTO = boardService.글보기(id, sessionUser.getId());
         return Resp.ok(respDTO);
@@ -35,7 +36,7 @@ public class BoardController {
 
     // 특이 - board와 연관된 모든 정보
     @GetMapping("/api/board/{id}/detail")
-    public @ResponseBody Resp<?> getBoardDetail(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> getBoardDetail(@PathVariable("id") Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         Integer sessionUserId = (sessionUser == null ? null : sessionUser.getId());
         BoardResponse.DetailDTO detailDTO = boardService.글상세보기(id, sessionUserId);
@@ -45,8 +46,8 @@ public class BoardController {
     // localhost:8080?page=0
     // localhost:8080
     @GetMapping({"/", "/api/board"})  // 둘 다 됨
-    public @ResponseBody Resp<?> list(@RequestParam(required = false, value = "page", defaultValue = "0") Integer page,
-                                      @RequestParam(required = false, value = "keyword", defaultValue = "") String keyword) {
+    public ResponseEntity<?> list(@RequestParam(required = false, value = "page", defaultValue = "0") Integer page,
+                                  @RequestParam(required = false, value = "keyword", defaultValue = "") String keyword) {
         User sessionUser = (User) session.getAttribute("sessionUser");
 
         BoardResponse.ListDTO respDTO;
@@ -59,7 +60,7 @@ public class BoardController {
     }
 
     @PostMapping("/s/api/board")
-    public @ResponseBody Resp<?> save(@Valid @RequestBody BoardRequest.SaveDTO reqDTO, Errors errors) {
+    public ResponseEntity<?> save(@Valid @RequestBody BoardRequest.SaveDTO reqDTO, Errors errors) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.DTO respDTO = boardService.글쓰기(reqDTO, sessionUser);
         return Resp.ok(respDTO);
