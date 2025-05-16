@@ -20,7 +20,7 @@ public class CorsFilter implements Filter {
 
         // Ajax fetch 요청
         response.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5500");  // origin - 다 허용 / 특정ip - 특정 ip만 허용 -> 프로토콜
-        //response.setHeader("Access-Control-Expose-Headers", "Authorization");  // 응답할 때 Authorization 응답 해줄지 말지 결정 / js 요청은 담아봤자 응답 안함
+        //response.setHeader("Access-Control-Expose-Headers", "Authorization");  // 이 헤더 응답을 JS로 접근하게 허용할지
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, OPTIONS");  // JS 요청들  OPTIONS -> pre-flight 요청
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Key, Content-Type, Accept, Authorization");  // 클라이언트가 요청할 때 특정 header 허용해줘 / X-Key - 프로토콜에 없는 임의 값 (커스터마이징 - 약속임 X 붙는거)

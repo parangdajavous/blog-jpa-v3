@@ -25,7 +25,7 @@ public class LogFilter implements Filter {
         String msg = "[로그] ${uri} | IP: ${ip} | UA: ${ua}"
                 .replace("${uri}", uri)
                 .replace("${ip}", ip)
-                .replace("${ua}", userAgent);
+                .replace("${ua}", userAgent != null ? userAgent : "Unknown");
         log.info(msg);
         filterChain.doFilter(servletRequest, servletResponse);
     }
